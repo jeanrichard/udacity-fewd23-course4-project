@@ -10,14 +10,12 @@ import express from 'express';
 import cors from 'cors';
 import { body, matchedData, validationResult } from 'express-validator';
 
-
 /*------------------------------------------------------------------------------------------------
  * Environment variables
  *------------------------------------------------------------------------------------------------*/
 
 dotenv.config();
 const meaningCloudApiKey = process.env.MEANING_CLOUD_API_KEY || '';
-
 
 /*------------------------------------------------------------------------------------------------
  * Utilities
@@ -47,7 +45,6 @@ const getData = async (url, timeoutMs = DEFAULT_TIMEOUT_MS) => {
         clearTimeout(timeoutId);
     }
 };
-
 
 /*------------------------------------------------------------------------------------------------
  * Integrating the MeaningCloud API
@@ -106,7 +103,7 @@ function sentimentMakeUrl(url, apiKey) {
 
 /**
  * Builds an excerpt made of trimmed sentences, joined by a separator. Trimmed sentences are added
- * unti their cumulated length is ≥ `stopLength`.
+ * until their cumulated length is ≥ `stopLength`.
  *
  * @param {any} resData deserialized JSON returned by the API.
  * @param {number} stopLength as described above.
@@ -162,7 +159,7 @@ function sentimentCheckResponse(resData, errMsg) {
     switch (apiCode) {
         case "103": // Request too large
             return [400, {
-                mesage: [
+                message: [
                     errMsg,
                     'Hint: The page is probably too large.',
                 ].join(' ')
@@ -210,10 +207,10 @@ async function sentimentAnalyze(url, apiKey, timeoutMs = DEFAULT_TIMEOUT_MS) {
         if (!res.ok) {
             // Not a 2xx status.
             if (res.status == 503) {
-                return [503, { mesage: errMsg, }];
+                return [503, { message: errMsg, }];
             } else {
                 // Map all other errors to 500.
-                return [500, { mesage: errMsg, }];
+                return [500, { message: errMsg, }];
             }
         }
 
@@ -305,7 +302,7 @@ app.post('/analyzeSentiment', [
 
 // Start the server.
 const server = app.listen(PORT, () => {
-    console.log(`Express app running on locahost: ${PORT}`);
+    console.log(`Express app running on localhost: ${PORT}`);
     console.log(`Express app cwd: ${cwd()}`);
 
     // Validate the configuration.
