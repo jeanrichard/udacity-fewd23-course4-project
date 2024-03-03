@@ -10,3 +10,53 @@ input {
   margin: 10px 0;
   line-height: 16px;
 }
+
+.results--snippet {
+  margin: 10px 0;
+
+  blockquote {
+    padding: 1rem;
+    margin: 1rem 0;
+    background-color: #f2f2f2;
+    quotes: '“' '”' "'" "'";
+  }
+
+  blockquote::before {
+    color: #a6a6a6;
+    content: open-quote;
+    font-size: 3em;
+    line-height: 0.1em;
+    vertical-align: -0.3em;
+  }
+
+  blockquote::after {
+    color: #a6a6a6;
+    content: close-quote;
+    font-size: 3em;
+    line-height: 0.1em;
+    vertical-align: -0.6em;
+  }
+}
+
+.results--features {
+  width: 100%;
+  margin: 10px 0;
+  border-collapse: collapse;
+
+  td,
+  th {
+    padding: 8px;
+    border: 1px solid #ddd;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+
+  th[scope=row] {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    font-weight: bold;
+    text-align: left;
+  }
+}

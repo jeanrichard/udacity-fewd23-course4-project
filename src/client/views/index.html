@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Sentiment analysis</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="logo">
+        <img
+          src="../icons/nlp.png"
+          alt="The logo of the Sentiment Analysis application. It shows a stylized head with a cogwheel spinning. It was chosen to convey the fact that the applicatino uses ML (Machine Learning) and NLP (Natural Language Processing)."
+        />
+      </div>
+      <h1>Sentiment analysis</h1>
+      <div class="about"><a href="#" onclick="clientlib.handleAbout(event)">About</a></div>
+    </header>
+
+    <main>
+      <section>
+        <form class="" onsubmit="return clientlib.handleSubmit(event)">
+          <input
+            id="target-url"
+            type="text"
+            name="target-url"
+            value=""
+            placeholder="Enter the URL of a web page to do sentiment analysis on"
+          />
+          <input
+            id="submit-btn"
+            type="submit"
+            name="submit-btn"
+            value="Submit"
+            onclick="return clientlib.handleSubmit(event)"
+          />
+        </form>
+      </section>
+      <section>
+        <h2>Results</h2>
+        <div id="results"></div>
+
+        <!-- Results template. -->
+        <template id="results-template">
+          <div class="results--snippet">
+            <p>Page snippet:</p>
+            <blockquote id="result-snippet"></blockquote>
+          </div>
+          <div class="results--features">
+            <p>Page features:</p>
+            <table class="results--features">
+              <tbody>
+                <tr>
+                  <th scope="row">Polarity</th>
+                  <td id="result-polarity"></td>
+                </tr>
+                <tr>
+                  <th scope="row">Agreement</th>
+                  <td id="result-agreement"></td>
+                </tr>
+                <tr>
+                  <th scope="row">Subjectivity</th>
+                  <td id="result-subjectivity"></td>
+                </tr>
+                <tr>
+                  <th scope="row">Confidence</th>
+                  <td id="result-confidence"></td>
+                </tr>
+                <tr>
+                  <th scope="row">Irony</th>
+                  <td id="result-irony"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </template>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        © Udacity / Changes by Etienne Richard /
+        <a href="https://www.flaticon.com/free-icons/nlp" title="nlp icons"
+          >NLP icons created by Freepik - Flaticon</a
+        >
+      </p>
+    </footer>
+  </body>
+</html>

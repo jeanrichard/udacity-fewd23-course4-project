@@ -22,18 +22,30 @@ export default {
           },
         },
       },
+      {
+        test: /\.(html)$/,
+        use: ['html-loader'],
+      },
+      {
+        test: /\.png/,
+        type: 'asset/resource',
+      },
     ],
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, './src/client/views/index.ejs'),
+      template: path.resolve(__dirname, './src/client/views/index.html'),
       filename: './index.html', // Relative to 'dist'.
     }),
   ],
   output: {
     clean: true,
-    // filename: 'bundle.js',
-    filename: '[name].bundle.js',
+    library: {
+      type: 'var',
+      name: 'clientlib',
+    },
+    filename: 'bundle.js',
+    // filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'dist'),
   },
 };

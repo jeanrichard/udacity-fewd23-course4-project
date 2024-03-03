@@ -2,13 +2,15 @@
 'use strict';
 
 // Node.
-import { cwd } from 'node:process';
+import { cwd, env } from 'node:process';
 
 // Express and other dependencies.
 import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 import { body, matchedData, validationResult } from 'express-validator';
+
+import { CANNED_ANALYSIS } from './mock-api.mjs';
 
 /*------------------------------------------------------------------------------------------------
  * Environment variables
@@ -35,11 +37,15 @@ const getData = async (url, timeoutMs = DEFAULT_TIMEOUT_MS) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
     try {
-        // May throw.
+        // This may throw.
         const res = await fetch(url, { signal: controller.signal });
         // At this point: we received status and headers.
-        const resData = await res.json();
-        // At this point: we received and deserialized the body as JSON.
+        let resData = null;
+        try {
+            // This may throw.
+            resData = await res.json();
+            // At this point: we received and deserialized the body as JSON.
+        } catch (_) { }
         return [res, resData];
     } finally {
         clearTimeout(timeoutId);
@@ -237,7 +243,7 @@ async function sentimentAnalyze(url, apiKey, timeoutMs = DEFAULT_TIMEOUT_MS) {
  * @param {express.Request} req 
  * @param {express.Response} res 
  */
-const handleAnalyzeSentiment = async (req, res) => {
+async function handleAnalyzeSentiment(req, res) {
     console.log('handleAnalyzeSentiment: req.body:', req.body);
     const result = validationResult(req);
     if (!result.isEmpty()) {
@@ -255,12 +261,32 @@ const handleAnalyzeSentiment = async (req, res) => {
     res.end();
 };
 
+
+async function handleAnalyzeSentimentTest(req, res) {
+    console.log('handleAnalyzeSentimentTest: req.body:', req.body);
+    const result = validationResult(req);
+    if (!result.isEmpty()) {
+        // There are validation errors.
+        res.status(400).send({
+            message: 'Invalid argument(s).',
+            errors: result.array(),
+        });
+    } else {
+        res.send(CANNED_ANALYSIS);
+    }
+    // Required for POST.
+    res.end();
+}
+
+
 /*------------------------------------------------------------------------------------------------
  * Main part
  *------------------------------------------------------------------------------------------------*/
 
 /** The port to listen on. */
 const PORT = 3000;
+
+const runenv = process.env.NODE_ENV || 'development';
 
 /* Express application. */
 
@@ -289,14 +315,31 @@ app.get('/', function (_req, res) {
     res.sendFile('dist/index.html')
 })
 
-app.post('/analyzeSentiment', [
-    body('url')
+/**
+ * Build the validation chain to use for the 'analyze-sentiment' end-point.
+ * @returns {import('express-validator').ValidationChain} as described above.
+ */
+function validateAnalyzeSentiment() {
+    return body('url')
         .isURL({
             protocols: ['http', 'https',],
             require_protocol: true,
         })
-        .withMessage('must be a valid URL'),
-], handleAnalyzeSentiment);
+        .withMessage('must be a valid URL');
+}
+
+app.post('/analyze-sentiment',
+    [validateAnalyzeSentiment(),],
+    handleAnalyzeSentiment
+);
+
+if (runenv === 'development') {
+    console.log('Adding test endpoint');
+    app.post('/test/analyze-sentiment',
+        [validateAnalyzeSentiment(),],
+        handleAnalyzeSentimentTest
+    );
+}
 
 /* Server. */
 
