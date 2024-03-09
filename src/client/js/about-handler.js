@@ -1,8 +1,12 @@
 // @ts-check
 'use strict';
 
+/**
+ * 
+ * @param {*} event 
+ */
 export function handleAbout(event) {
-    console.log("::: handleAbout :::");
+    console.log("::: About information requested :::");
 
     // We do no want to submit the form.
     event.preventDefault();

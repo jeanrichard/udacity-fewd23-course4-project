@@ -1,4 +1,4 @@
-import { checkIsValidUrl } from './js/url-checker'
+import { isValidUrl } from './js/url-checker'
 import { handleAbout } from './js/about-handler'
 import { handleSubmit } from './js/form-handler'
 
@@ -13,4 +13,4 @@ import './styles/header.scss'
 // alert("I EXIST")
 console.log("CHANGE!!!");
 
-export { checkIsValidUrl, handleAbout, handleSubmit };
+export { isValidUrl, handleAbout, handleSubmit };

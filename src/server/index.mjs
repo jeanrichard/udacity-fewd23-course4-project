@@ -2,7 +2,7 @@
 'use strict';
 
 // Node.
-import { cwd, env } from 'node:process';
+import { cwd } from 'node:process';
 
 // Express and other dependencies.
 import dotenv from 'dotenv';
@@ -35,7 +35,10 @@ const DEFAULT_TIMEOUT_MS = 10_000; // 10 seconds
 const getData = async (url, timeoutMs = DEFAULT_TIMEOUT_MS) => {
     // We want strict timeouts on all API calls.
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    const timeoutId = setTimeout(() => {
+        console.log('getData: Aborting fetch...');
+        controller.abort()
+    }, timeoutMs);
     try {
         // This may throw.
         const res = await fetch(url, { signal: controller.signal });
@@ -45,7 +48,7 @@ const getData = async (url, timeoutMs = DEFAULT_TIMEOUT_MS) => {
             // This may throw.
             resData = await res.json();
             // At this point: we received and deserialized the body as JSON.
-        } catch (_) { }
+        } catch { }
         return [res, resData];
     } finally {
         clearTimeout(timeoutId);
@@ -100,7 +103,7 @@ function sentimentMakeUrl(url, apiKey) {
     const reqUrlObj = new URL(SENTIMENT_ANALYSIS_API_BASE_URL);
     reqUrlObj.search = new URLSearchParams({
         key: apiKey,
-        lang: 'auto', // Perform language detection.
+        lang: 'auto', // Perform language detection on the target page.
         ilang: 'en',  // Return values in English.
         url: url,
     }).toString();
@@ -150,7 +153,7 @@ function sentimentCheckResponse(resData, errMsg) {
         const polarity = SCORE_TAG_TO_POLARITY.get(resData.score_tag) || 'n/a';
         const snippet = sentimentGetSnippet(resData);
         /** @type {SentimentAnalysis} */
-        const result = {
+        const analysis = {
             polarity,
             agreement: resData.agreement.toLowerCase(),
             subjectivity: resData.subjectivity.toLowerCase(),
@@ -158,7 +161,7 @@ function sentimentCheckResponse(resData, errMsg) {
             irony: resData.irony.toLowerCase(),
             snippet,
         };
-        return [200, result];
+        return [200, analysis];
     }
 
     // There was an error.
@@ -210,7 +213,7 @@ async function sentimentAnalyze(url, apiKey, timeoutMs = DEFAULT_TIMEOUT_MS) {
         console.log('analyzeSentiment: res.status, resData:', res.status, resData);
 
         // 1. We check the HTTP status code.
-        if (!res.ok) {
+        if (!res.ok || resData === null) {
             // Not a 2xx status.
             if (res.status == 503) {
                 return [503, { message: errMsg, }];
@@ -234,14 +237,15 @@ async function sentimentAnalyze(url, apiKey, timeoutMs = DEFAULT_TIMEOUT_MS) {
 }
 
 /*------------------------------------------------------------------------------------------------
-* Handlers
-*------------------------------------------------------------------------------------------------*/
+ * Handlers
+ *------------------------------------------------------------------------------------------------*/
 
 /**
- * Creates a new entry.
+ * Handles a request for sentiment analysis.
+ * Note: We return a 400 - Bad Request if the request failed validation.
  *
- * @param {express.Request} req 
- * @param {express.Response} res 
+ * @param {express.Request} req the request.
+ * @param {express.Response} res the response.
  */
 async function handleAnalyzeSentiment(req, res) {
     console.log('handleAnalyzeSentiment: req.body:', req.body);
@@ -261,7 +265,13 @@ async function handleAnalyzeSentiment(req, res) {
     res.end();
 };
 
-
+/**
+ * Behaves exactly like 'handleAnalyzeSentiment' but returns canned data.
+ * Note: Used for testing purposes.
+ *
+ * @param {express.Request} req the request.
+ * @param {express.Response} res the response.
+ */
 async function handleAnalyzeSentimentTest(req, res) {
     console.log('handleAnalyzeSentimentTest: req.body:', req.body);
     const result = validationResult(req);
@@ -286,6 +296,7 @@ async function handleAnalyzeSentimentTest(req, res) {
 /** The port to listen on. */
 const PORT = 3000;
 
+/** The runtime environment: 'production' or 'development'. */
 const runenv = process.env.NODE_ENV || 'development';
 
 /* Express application. */
@@ -316,7 +327,7 @@ app.get('/', function (_req, res) {
 })
 
 /**
- * Build the validation chain to use for the 'analyze-sentiment' end-point.
+ * Builds the validation chain to use for the 'analyze-sentiment' end-point.
  * @returns {import('express-validator').ValidationChain} as described above.
  */
 function validateAnalyzeSentiment() {
@@ -333,8 +344,9 @@ app.post('/analyze-sentiment',
     handleAnalyzeSentiment
 );
 
+// We only add test endpoints in development.
 if (runenv === 'development') {
-    console.log('Adding test endpoint');
+    console.log('Adding test endpoints...');
     app.post('/test/analyze-sentiment',
         [validateAnalyzeSentiment(),],
         handleAnalyzeSentimentTest

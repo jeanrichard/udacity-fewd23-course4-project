@@ -12,16 +12,18 @@ export default {
   entry: path.resolve(__dirname, 'src/client/index.js'),
   module: {
     rules: [
-      {
-        test: /\.m?js$/,
-        exclude: /node_modules/,
-        use: {
-          loader: "babel-loader",
-          options: {
-            presets: ['@babel/preset-env']
-          },
-        },
-      },
+      // Support for ESM is experimental in Jest.
+      // The simplest approach seems to have a 'babel.config.json' file.
+      // {
+      //   test: /\.m?js$/,
+      //   exclude: /node_modules/,
+      //   use: {
+      //     loader: "babel-loader",
+      //     options: {
+      //       presets: ['@babel/preset-env']
+      //     },
+      //   },
+      // },
       {
         test: /\.(html)$/,
         use: ['html-loader'],
