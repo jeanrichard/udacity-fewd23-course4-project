@@ -31,15 +31,15 @@ export default merge(webpackCommon, {
             },
           },
           {
-            loader: "postcss-loader",
+            loader: 'postcss-loader',
             options: {
               postcssOptions: {
                 plugins: {
                   autoprefixer: {},
                 },
                 sourceMap: true,
-              }
-            }
+              },
+            },
           },
           {
             loader: 'sass-loader',

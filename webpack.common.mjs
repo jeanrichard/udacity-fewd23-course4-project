@@ -3,8 +3,6 @@ import { fileURLToPath } from 'url';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 
 // `__dirname` is not available in ES6 modules.
-// Requires Node 20.11+. 
-// const __dirname = import.meta.dirname;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -12,18 +10,6 @@ export default {
   entry: path.resolve(__dirname, 'src/client/index.js'),
   module: {
     rules: [
-      // Support for ESM is experimental in Jest.
-      // The simplest approach seems to have a 'babel.config.json' file.
-      // {
-      //   test: /\.m?js$/,
-      //   exclude: /node_modules/,
-      //   use: {
-      //     loader: "babel-loader",
-      //     options: {
-      //       presets: ['@babel/preset-env']
-      //     },
-      //   },
-      // },
       {
         test: /\.(html)$/,
         use: ['html-loader'],

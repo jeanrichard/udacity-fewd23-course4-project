@@ -1,12 +1,7 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import WorkboxPlugin from 'workbox-webpack-plugin';
 import webpackCommon from './webpack.common.mjs';
 import { merge } from 'webpack-merge';
-
-// `__dirname` is not available in ES6 modules.
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 export default merge(webpackCommon, {
   mode: 'production',
@@ -22,15 +17,15 @@ export default merge(webpackCommon, {
           },
           'css-loader',
           {
-            loader: "postcss-loader",
+            loader: 'postcss-loader',
             options: {
               postcssOptions: {
                 plugins: {
                   autoprefixer: {},
                   cssnano: {},
                 },
-              }
-            }
+              },
+            },
           },
           'sass-loader',
         ],
@@ -39,7 +34,12 @@ export default merge(webpackCommon, {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: "[name].css",
+      filename: '[name].css',
+    }),
+    new WorkboxPlugin.GenerateSW({
+      // See https://webpack.js.org/guides/progressive-web-application/.
+      clientsClaim: true,
+      skipWaiting: true,
     }),
   ],
 });
