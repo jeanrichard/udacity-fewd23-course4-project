@@ -1,4 +1,8 @@
 {
   "plugins": ["prettier-plugin-organize-attributes"],
-  "printWidth": 100
+  "attributeGroups": ["$DEFAULT"],
+  "attributeSort": "ASC",
+  "printWidth": 100,
+  "singleQuote": true,
+  "tabWidth": 2
 }

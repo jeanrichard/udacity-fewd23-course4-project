@@ -2,7 +2,7 @@
 // @ts-check
 'use strict';
 
-import { enableFetchMocks } from 'jest-fetch-mock'
+import { enableFetchMocks } from 'jest-fetch-mock';
 enableFetchMocks();
 
 import { afterEach, beforeEach, describe, expect, jest, it } from '@jest/globals';
@@ -11,18 +11,18 @@ import { handleSubmit } from '../src/client/js/form-handler.js';
 import * as urlChecker from '../src/client/js/url-checker.js';
 
 const CANNED_ANALYSIS = {
-  "polarity": "positive",
-  "agreement": "agreement",
-  "subjectivity": "objective",
-  "confidence": 42,
-  "irony": "ironic",
-  "snippet": "What do you get if you multiply six by nine?"
+  polarity: 'positive',
+  agreement: 'agreement',
+  subjectivity: 'objective',
+  confidence: 42,
+  irony: 'ironic',
+  snippet: 'What do you get if you multiply six by nine?',
 };
 
 /**
  * Returns a subset of 'index.html' useful for the test.
- * @param {*} targetUrl 
- * @returns 
+ * @param {*} targetUrl
+ * @returns
  */
 function makePageSnippet(targetUrl) {
   return `
@@ -31,7 +31,7 @@ function makePageSnippet(targetUrl) {
       id="target-url"
       type="text"
       name="target-url"
-      value=""
+      value="${targetUrl}"
       placeholder="Enter the URL of a web page to do sentiment analysis on"
     />
     <input
@@ -83,8 +83,8 @@ function makePageSnippet(targetUrl) {
 }
 
 describe('Testing functionality to submit the form', () => {
-
   beforeEach(() => {
+    // Fetch.
     /** @ts-ignore: Property 'resetMocks' does not exist on type ... */
     fetch.resetMocks();
     /** @ts-ignore: Property 'doMock' does not exist on type ... */
@@ -92,6 +92,7 @@ describe('Testing functionality to submit the form', () => {
   });
 
   afterEach(() => {
+    // Mocks.
     jest.clearAllMocks();
   });
 
@@ -105,14 +106,14 @@ describe('Testing functionality to submit the form', () => {
     const isValidSpy = jest.spyOn(urlChecker, 'isValidUrl').mockReturnValueOnce(false);
 
     // Mock the 'window.alert' function to do nothing.
-    const alertSpy = jest.spyOn(window, 'alert').mockImplementationOnce(() => { });
+    const alertSpy = jest.spyOn(window, 'alert').mockImplementationOnce(() => {});
 
     // Act.
 
     // Call our 'handleSubmit' function.
     /** @type {SubmitEvent} */
     // @ts-ignore: Type ... is missing the following properties from type 'SubmitEvent': ... .
-    const mockSubmitEvent = { preventDefault: () => { } };
+    const mockSubmitEvent = { preventDefault: () => {} };
     handleSubmit(mockSubmitEvent);
 
     // Assert.
@@ -131,7 +132,7 @@ describe('Testing functionality to submit the form', () => {
     const isValidSpy = jest.spyOn(urlChecker, 'isValidUrl').mockReturnValueOnce(true);
 
     // Mock the 'window.alert' function to do nothing.
-    const alertSpy = jest.spyOn(window, 'alert').mockImplementationOnce(() => { });
+    const alertSpy = jest.spyOn(window, 'alert').mockImplementationOnce(() => {});
 
     /** @ts-ignore: Property 'mockRejectOnce' does not exist on type ... */
     fetch.mockResponseOnce(JSON.stringify(CANNED_ANALYSIS));
@@ -141,7 +142,7 @@ describe('Testing functionality to submit the form', () => {
     // Call our 'handleSubmit' function.
     /** @type {SubmitEvent} */
     // @ts-ignore: Type ... is missing the following properties from type 'SubmitEvent': ... .
-    const mockSubmitEvent = { preventDefault: () => { } };
+    const mockSubmitEvent = { preventDefault: () => {} };
     // Do no forget to wait.
     await handleSubmit(mockSubmitEvent);
 
@@ -153,15 +154,22 @@ describe('Testing functionality to submit the form', () => {
     /** @ts-ignore */
     expect(document.querySelector('#result-snippet').textContent).toEqual(CANNED_ANALYSIS.snippet);
     /** @ts-ignore */
-    expect(document.querySelector('#result-polarity').textContent).toEqual(CANNED_ANALYSIS.polarity);
+    expect(document.querySelector('#result-polarity').textContent).toEqual(
+      CANNED_ANALYSIS.polarity,
+    );
     /** @ts-ignore */
-    expect(document.querySelector('#result-agreement').textContent).toEqual(CANNED_ANALYSIS.agreement);
+    expect(document.querySelector('#result-agreement').textContent).toEqual(
+      CANNED_ANALYSIS.agreement,
+    );
     /** @ts-ignore */
-    expect(document.querySelector('#result-subjectivity').textContent).toEqual(CANNED_ANALYSIS.subjectivity);
+    expect(document.querySelector('#result-subjectivity').textContent).toEqual(
+      CANNED_ANALYSIS.subjectivity,
+    );
     /** @ts-ignore */
-    expect(document.querySelector('#result-confidence').textContent).toEqual(`${CANNED_ANALYSIS.confidence}%`);
+    expect(document.querySelector('#result-confidence').textContent).toEqual(
+      `${CANNED_ANALYSIS.confidence}%`,
+    );
     /** @ts-ignore */
     expect(document.querySelector('#result-irony').textContent).toEqual(CANNED_ANALYSIS.irony);
   });
-
 });
