@@ -1,108 +1,341 @@
-# Project Instructions
+# Project 4 — Evaluate a News Article with Natural Language Processing
 
-This repo is your starter code for the project. It is the same as the starter code we began with in lesson 2. Install and configure Webpack just as we did in the course. Feel free to refer to the course repo as you build this one, and remember to make frequent commits and to create and merge branches as necessary!
+This repository contains the code for Project 4 — _Evaluate a News Article with Natural Language
+Processing_ of the Udacity Nanodegree Front End Web Developer (2023-2024).
 
-The goal of this project is to give you practice with:
-- Setting up Webpack
-- Sass styles
-- Webpack Loaders and Plugins
-- Creating layouts and page design
-- Service workers
-- Using APIs and creating requests to external urls
+**ⓘ Note:** This project is based on the starter project at
+https://github.com/udacity/fend/tree/refresh-2019/projects/evaluate-news-nlp. The original README
+has been kept as-is in [README.original.md](./README.original.md).
 
-On top of that, I want to introduce you to the topic of Natural Language Processing. NLPs leverage machine learning and deep learning create a program that can interpret natural human speech. Systems like Alexa, Google Assistant, and many voice interaction programs are well known to us, but understanding human speech is an incredibly difficult task and requires a lot of resources to achieve. Full disclosure, this is the Wikipedia definition, but I found it to be a clear one:
+Content:
 
-> Natural language processing (NLP) is a subfield of computer science, information engineering, and artificial intelligence
-concerned with the interactions between computers and human (natural) languages, in particular how to program computers to
-process and analyze large amounts of natural language data.
+- [1. Instructions](#instructions)
+  - Installation
+  - Configuration
+  - Running in development
+  - Running in production
+  - Running the tests
+  - Formatting and linting the code
+- [2. Design notes](#design-notes)
+- [3. Sources and assets](#sources-and-assets)
+- [4. Additional references](#additional-references)
+- [5. Tools used](#tools-used)
+- [6. How to use Dev Containers](#how-to-use-dev-containers)
 
-You could spend years and get a masters degree focusing on the details of creating NLP systems and algorithms. Typically, NLP programs require far more resources than individuals have access to, but a fairly new API called Aylien has put a public facing API in front of their NLP system. We will use it in this project to determine various attributes of an article or blog post.
+<a id="instructions"></a>
 
-## Getting started
+## Instructions
 
-It would probably be good to first get your basic project setup and functioning. Follow the steps from the course up to Lesson 4 but don't add Service Workers just yet. We won't need the service workers during development and having extra caches floating around just means there's more potential for confusion. So, fork this repo and begin your project setup.
+See the original README in [README.original.md](./README.original.md).
 
-Remember that once you clone, you will still need to install everything:
+This project consists of 2 components:
 
-`cd` into your new folder and run:
-- `npm install`
+- **Front-end**: The front-end is a single page application (SPA). It allows the user to enter the
+  URL of a page on which to perform sentiment analysis, and displays the results of the analysis.
+- **Back-end**: The back-end is an API. It is responsible for performing the actual sentiment
+  analysis using a 3rd party service. In this iteration of the course, the 3rd party service is
+  https://www.meaningcloud.com/. You can create a developer account
+  [here](https://www.meaningcloud.com/developer/create-account). The documentation of the Sentiment
+  Analysis is [here](https://www.meaningcloud.com/developer/sentiment-analysis).
 
-## Setting up the API
+Here is a screenshot of the front-end.
 
-The Aylien API is perhaps different than what you've used before. It has you install a node module to run certain commands through, it will simplify the requests we need to make from our node/express backend.
+<img
+  src="./assets/app-screenshot.png"
+  alt="A screenshot of the front-end showing the results after performing sentiment analysis on https://example.com/."
+  width="50%"
+/>
 
-### Step 1: Signup for an API key
-First, you will need to go [here](https://developer.aylien.com/signup). Signing up will get you an API key. Don't worry, at the time of this course, the API is free to use up to 1000 requests per day or 333 intensive requests. It is free to check how many requests you have remaining for the day.
+### Installation
 
-### Step 2: Install the SDK
-Next you'll need to get the SDK. SDK stands for Software Development Kit, and SDKs are usually a program that brings together various tools to help you work with a specific technology. SDKs will be available for all the major languages and platforms, for instance the Aylien SDK brings together a bunch of tools and functions that will make it possible to interface with their API from our server and is available for Node, Python, PHP, Go, Ruby and many others. We are going to use the Node one, the page is available [here](https://docs.aylien.com/textapi/sdks/#sdks). You get 1000 free requests per day. 
+This projet is built with [Node.js](https://nodejs.org/) (version 20) and managed with `npm`. For
+convenience, it was developed using [Development Containers](https://containers.dev/), but this is
+not a hard requirement. Any local installation of a suitable verison of Node (e.g., with
+[nvm](https://github.com/nvm-sh/nvm)) should work.
 
-### Step 3: Require the SDK package
-Install the SDK in your project and then we'll be ready to set up your server/index.js file.
+To install all the dependencies:
 
-Your server index.js file must have these things:
-
-- [ ] Require the Aylien npm package
+```bash
+npm install
 ```
-var aylien = require("aylien_textapi");
-```
 
-### Step 4: Environment Variables
-Next we need to declare our API keys, which will look something like this:
-```
-// set aylien API credentias
-var textapi = new aylien({
-  application_id: "your-api-id",
-  application_key: "your-key"
-});
-```
+### Configuration
 
-...but there's a problem with this. We are about to put our personal API keys into a file, but when we push, this file is going to be available PUBLICLY on Github. Private keys, visible publicly are never a good thing. So, we have to figure out a way to make that not happen. The way we will do that is with environment variables. Environment variables are pretty much like normal variables in that they have a name and hold a value, but these variables only belong to your system and won't be visible when you push to a different environment like Github.
+The back-end reads your MeaningCloud API key from a [_.env_](https://www.npmjs.com/package/dotenv)
+file:
 
-- [ ] Use npm or yarn to install the dotenv package ```npm install dotenv```. This will allow us to use environment variables we set in a new file
-- [ ] Create a new ```.env``` file in the root of your project
-- [ ] Go to your .gitignore file and add ```.env``` - this will make sure that we don't push our environment variables to Github! If you forget this step, all of the work we did to protect our API keys was pointless.
-- [ ] Fill the .env file with your API keys like this:
-```
-API_ID=**************************
-API_KEY=**************************
-```
-- [ ] Add this code to the very top of your server/index.js file:
-```
-const dotenv = require('dotenv');
-dotenv.config();
-```
-- [ ] Reference variables you created in the .env file by putting ```process.env``` in front of it, an example might look like this:
-```
-console.log(`Your API key is ${process.env.API_KEY}`);
-```
-...Not that you would want to do that. This means that our updated API credential settings will look like this:
+- Create a _.env_ file at the root of the project.
+- Configure your API key:
+  ```shell
+  MEANING_CLOUD_API_KEY="<your-API-key>"
+  ```
+
+### Run in development
+
+**Option 1.** Run the project using the
+[Webpack Development Server](https://webpack.js.org/configuration/dev-server/):
+
+- Open a 1st shell and start serving the front-end with the Webpack Development Server:
+  ```bash
+  # Shell 1.
+  npm run serve-dev
+  ```
+- Open a 2nd shell and start the back-end:
+  ```bash
+  # Shell 2.
+  npm run start-dev
+  ```
+- Open a browser and navigate to http://localhost:8080/ (should be automatic if you are using Visual
+  Studio Code).
+
+This option is best suited for quick development as changes are immediately reflected in the UI
+thanks to Hot Module Reloading (HMR).
+
+**Option 2.** Run the project using the back-end to serve a full development build:
+
+- Open a shell, make a development build and start the back-end:
+  ```bash
+  npm run build-dev
+  npm run start-dev
+  ```
+- Open a browser and navigate to http://localhost:3000/ (should be automatic if you are using Visual
+  Studio Code).
+
+### Running in production
+
+Run the project using the back-end to serve a full production build:
+
+- Open a shell, make a production build and start the back-end:
+  ```bash
+  npm run build-prod
+  npm run start-prod
+  ```
+- Open a browser and navigate to http://localhost:3000/ (should be automatic if you are using Visual
+  Studio Code).
+
+### Running the tests
+
+Units tests use [Jest](https://jestjs.io/).
+
+To run the tests:
+
+- Open a shell.
+  ```bash
+  npm run test
+  ```
+
+### Formatting and linting the code
+
+#### Formatting
+
+We use [Prettier](https://prettier.io/) for formatting most files:
+
+- See the [_.prettierrc_](./.prettierrc) file at the root of the project.
+- To manually format all files:
+  ```bash
+  # At the root of the project.
+  npx prettier --write .
+  ```
+
+**Note:** We use the
+[prettier-plugin-organize-attributes](https://www.npmjs.com/package/prettier-plugin-organize-attributes)
+plug-in to automatically reorder the attributes of HTML elements.
+
+We use [Stylelint](https://stylelint.io/) for formatting styles sheets (_\*.css_, _\*.scss_ and
+_\*.sass_ files):
+
+- See the [_.stylelintrc.json_](./.stylelintrc.json) file at the root of the project.
+- To manually format all style sheets:
+  ```bash
+  # At the root of the project.
+  npx stylelint --fix "./src/client/styles/*.{css,scss,sass}"
+  ```
+
+**Note:** We use the
+[stylelint-config-idiomatic-order ](https://github.com/ream88/stylelint-config-idiomatic-order)
+plug-in to automatically reorder CSS properties according to
+[Principles of writing consistent, idiomatic CSS](https://github.com/necolas/idiomatic-css#declaration-order).
+
+#### Linting
+
+We use [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) for
+linting _\*.js_ files.
+
+Moreover, since Visual Studio Code come with language support for JavaScript and TypeScript. We put
+`// @ts-check` at the top of all JavaScript files to benefit from the power of the TypeScript
+compiler. See
+[_JS Projects Utilizing TypeScript_](https://www.typescriptlang.org/docs/handbook/intro-to-js-ts.html).
+In summary, all source _\*.js_ files should start with:
+
 ```javascript
-// set aylien API credentials
-// NOTICE that textapi is the name I used, but it is arbitrary. 
-// You could call it aylienapi, nlp, or anything else, 
-//   just make sure to make that change universally!
-var textapi = new aylien({
-  application_id: process.env.API_ID,
-  application_key: process.env.API_KEY
-});
+// @ts-check
+'use strict';
 ```
 
-### Step 5: Using the API
+<a id="design-notes"></a>
 
-We're ready to go! The API has a lot of different endpoints you can take a look at [here](https://docs.aylien.com/textapi/endpoints/#api-endpoints). And you can see how using the SDK simplifies the requests we need to make. 
+## Design notes
 
-I won't provide further examples here, as it's up to you to create the various requests and make sure your server is set up appropriately.
+### Front-end
 
-## After the Aylien API
+As mentioned above, the front-end is a single page application (SPA). It allows the user to enter
+the URL of a page on which to perform sentiment analysis, and displays the results of the analysis.
 
-Once you are hooked up to the Aylien API, you are most of the way there! Along with making sure you are following all the requirements in the project rubric in the classroom, here are a few other steps to make sure you take.
+The normal flow is:
 
-- Parse the response body to dynamically fill content on the page.
-- Test that the server and form submission work, making sure to also handle error responses if the user input does not match API requirements. 
-- Go back to the web pack config and add the setup for service workers.  
-- Test that the site is now available even when you stop your local server 
+- The front-end sends a request with the target URL to the back-end.
+- The back-end performs sentiment analysis on the target page.
+- The back-end sends a response back to the front-end.
+- The front-end updates the page to present the results.
 
-## Deploying
+We try to handle the following classes of errors:
 
-A great step to take with your finished project would be to deploy it! Unfortunately its a bit out of scope for me to explain too much about how to do that here, but checkout [Netlify](https://www.netlify.com/) or [Heroku](https://www.heroku.com/) for some really intuitive free hosting options.
+- Invalid user input (e.g., maformed target URL).
+- Network issues. One measure is to have strict timeouts on all `fetch()` calls using an
+  `AbortController` and `setTimeout()`.
+- Errors reported by the back-end (client errors, internal errors, etc.).
+
+Implementation:
+
+- The front-end is implemented as a hand-rolled single page application (SPA).
+- The project is managed and bundled with [Webpack 5](https://webpack.js.org/). Common settings are
+  factored out in a separate _webpack.common.mjs_. The setup is based on the free
+  [Webpack 5 Fundamentals](https://www.udemy.com/course/webpack-5-fundamentals/) tutorial by Robert
+  Guss.
+- Styles are managed with [Sass](https://sass-lang.com/).
+- The front-end is turned into a
+  [Progressive Web Application](https://webpack.js.org/guides/progressive-web-application/) (PWA) by
+  adding Service Workers (SW) with [Workbox](https://github.com/GoogleChrome/workbox).
+- We use features of the latest version of JavaScript (ECMAScript) and Babel with
+  [@babel/preset-env](https://babeljs.io/docs/babel-preset-env) to transpile to an older version.
+- We use [ECMAScript Modules](https://nodejs.org/docs/latest-v20.x/api/esm.html) (ESM) instead of
+  [CommonJS Modules](https://nodejs.org/docs/latest-v20.x/api/modules.html) (CJS).
+
+Tests:
+
+- Units tests use [Jest](https://jestjs.io/).
+- We use a few additional modules:
+  - https://www.npmjs.com/package/jest-fetch-mock for testing functions that make use of `fetch()`
+    calls.
+  - https://www.npmjs.com/package/jest-environment-jsdom for testing function that update the DOM.
+
+### Back-end
+
+As mentioned above, the back-end is an API. It is responsible for performing the actual sentiment
+analysis using a 3rd party service. In this iteration of the course, the 3rd party service is
+https://www.meaningcloud.com/.
+
+The normal flow for the `/analyze-sentiment`endpoint is:
+
+- The back-end receives a request from the client.
+- The back-end validates the request (and immediately sends an error response if needed).
+- The back-end sends a request with the target URL and other arguments to the Sentiment Analysis
+  API.
+- The Sentiment Analysis API sends a response back to the back-end.
+- The back-end processes the response. This mostly involes: (a) Reformatting the response to match
+  our own interface. (b) Mapping error codes specifc to the Sentiment Analysis API to our own error
+  messages. This would make it possible to swap the 3rd party service in the future.
+- The back-end sends a response with the results (or the error) to the client.
+
+We try to handle the following classes of errors:
+
+- Invalid request (e.g., maformed target URL).
+- Network issues. One measure is to have strict timeouts on all `fetch()` calls using an
+  `AbortController` and `setTimeout()`.
+- Errors reported by the Sentiment Analysis API (client errors, internal errors, etc.).
+
+Implementation:
+
+- The back-end is implemented as an [Express.js](https://expressjs.com/) application.
+- We use [ECMAScript Modules](https://nodejs.org/docs/latest-v20.x/api/esm.html) (ESM) instead of
+  [CommonJS Modules](https://nodejs.org/docs/latest-v20.x/api/modules.html) (CJS).
+- We use a few additional modules:
+  - [express-validator](https://www.npmjs.com/package/express-validator) to validate requests made
+    by clients.
+
+<a id="sources-and-assets"></a>
+
+## 3. Sources and assets
+
+We added the following additional assets to the starter project:
+
+- PNG-s from [Flaticon](https://www.flaticon.com/) (free for personal and commercial use with
+  attribution, see [Flaticon Terms of use](https://www.freepikcompany.com/legal#nav-flaticon) for
+  details):
+
+  - [This icon](https://www.flaticon.com/free-icon/nlp_9716603?term=nlp&page=1&position=3&origin=tag&related_id=9716603)
+    from the [Nlp icons created by Freepik - Flaticon](https://www.flaticon.com/free-icons/nlp).  
+    Author: N/a  
+    Use: Logo
+
+<a id="additional-references"></a>
+
+## 4. Additional references
+
+In addition to the material presented in the course, we used:
+
+- Free [Webpack 5 Fundamentals](https://www.udemy.com/course/webpack-5-fundamentals/) tutorial by
+  Robert Guss.
+
+<a id="tools-used"></a>
+
+## 5. Tools used
+
+- [Visual Studio Code](https://code.visualstudio.com/).  
+  Use: IDE.  
+  **Extensions:**
+
+  - [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)  
+    Use: Containerized Node setup for local development.
+
+  - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)  
+    Use: Linter for JavaSCript.
+
+- [Prettier](https://prettier.io/) as a local install (not the Visual Studio Code extension).  
+  Use: Linter/formatter for JavaScript, HTML and CSS files.  
+  **Plugins:**
+
+  - [prettier-plugin-organize-attributes](https://www.npmjs.com/package/prettier-plugin-organize-attributes)  
+    Use: Automatically reorder HTML element attributes.
+
+- [Stylelint](https://stylelint.io/) as a local install (not the Visual Studio Code extension).  
+   Use: Linter for CSS files.  
+   **Plugins:**
+
+  - [stylelint-config-idiomatic-order ](https://github.com/ream88/stylelint-config-idiomatic-order)  
+    Use: Automatically reorder CSS properties according to
+    [Principles of writing consistent, idiomatic CSS](https://github.com/necolas/idiomatic-css#declaration-order).
+
+- Chrome extensions:
+
+  - [axe DevTools - Web Accessibility Testing](https://chrome.google.com/webstore/detail/axe-devtools-web-accessib/lhdoppojpmngadmnindnejefpokejbdd)  
+    Use: Web Accessibility Testing
+
+<a id="how-to-use-dev-containers"></a>
+
+## 6. How to use Dev Containers
+
+To setup the environment:
+
+1. Install Docker and make it possible to manage it as non-root.
+2. Create _.devcontainer.json_ (already included in this project):
+
+   ```json
+   {
+     "image": "mcr.microsoft.com/devcontainers/javascript-node:20"
+   }
+   ```
+
+3. Use the Command Palette: `Dev Containers: Reopen in Container`.
+4. Open a terminal inside the container.
+
+To run the project:
+
+1. Refer to the [Instructions](#instructions) section above.
+2. Run:
+
+   ```bash
+   npm run ...  # Or npx ... for a tool.
+   ```
+
+3. The extension exposes the port and offers to launch the default browser.
